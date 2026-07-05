@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id        String    @id @default(uuid())
+  name      String
+  order     Int       @default(0)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id            String         @id @default(uuid())
+  name          String
+  familyId      String
+  family        Family         @relation(fields: [familyId], references: [id])
+  salePrice     Float
+  purchasePrice Float?
+  stock         Int            @default(0)
+  barcode       String?        @unique
+  order         Int            @default(0)
+  trackStock    Boolean        @default(true)
+  minStock      Int            @default(5)
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  purchaseItems PurchaseItem[]
+  saleItems     SaleItem[]
+}
+
+model Purchase {
+  id        String         @id @default(uuid())
+  supplier  String?
+  date      DateTime       @default(now())
+  items     PurchaseItem[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model PurchaseItem {
+  id         String   @id @default(uuid())
+  purchaseId String
+  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  cost       Float?
+}
+
+model Sale {
+  id        String     @id @default(uuid())
+  total     Float
+  items     SaleItem[]
+  createdAt DateTime   @default(now())
+}
+
+model SaleItem {
+  id        String  @id @default(uuid())
+  saleId    String
+  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id])
+  customName String?
+  quantity   Int
+  unitPrice  Float
+}
