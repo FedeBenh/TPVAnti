@@ -4,13 +4,14 @@ export type CartItem = {
   productId: string;
   name: string;
   price: number;
+  purchasePrice?: number;
   quantity: number;
   isManual?: boolean;
 };
 
 interface PosState {
   cart: CartItem[];
-  addItem: (product: { id: string; name: string; salePrice: number; isManual?: boolean }) => void;
+  addItem: (product: { id: string; name: string; salePrice: number; purchasePrice?: number; isManual?: boolean }) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -39,6 +40,7 @@ export const usePosStore = create<PosState>((set, get) => ({
             productId: product.id,
             name: product.name,
             price: product.salePrice,
+            purchasePrice: product.purchasePrice,
             quantity: 1,
             isManual: product.isManual,
           },

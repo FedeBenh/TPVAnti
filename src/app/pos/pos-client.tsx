@@ -21,7 +21,7 @@ import {
 import { ShoppingCart } from "lucide-react";
 
 type Family = { id: string; name: string };
-type Product = { id: string; name: string; familyId: string; salePrice: number; active: boolean };
+type Product = { id: string; name: string; familyId: string; salePrice: number; purchasePrice?: number | null; active: boolean };
 
 import {
   Dialog,
@@ -132,6 +132,7 @@ export function PosClient({
             customName: item.isManual ? item.name : undefined,
             quantity: item.quantity,
             unitPrice: item.price,
+            unitCost: item.purchasePrice || 0,
           })),
         });
         toast.success("Venta completada");
@@ -246,6 +247,7 @@ export function PosClient({
                 id: "manual-" + Date.now(), 
                 name, 
                 salePrice: price, 
+                purchasePrice: 0,
                 isManual: true 
               })
             } 

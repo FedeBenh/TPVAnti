@@ -71,4 +71,5 @@ model SaleItem {
   customName String?
   quantity   Int
   unitPrice  Float
+  unitCost   Float?
 }

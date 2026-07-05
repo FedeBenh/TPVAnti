@@ -127,3 +127,78 @@ export async function getFamilySalesReportData(period?: "day" | "month") {
 
   return { rows, totalDia };
 }
+
+export async function getProfitReportData(period?: "day" | "month") {
+  let dateFilter = {};
+  if (period === "day") {
+    dateFilter = { gte: getLogicalDayStart() };
+  } else if (period === "month") {
+    const today = new Date();
+    dateFilter = { gte: new Date(today.getFullYear(), today.getMonth(), 1) };
+  }
+
+  const sales = await prisma.sale.findMany({
+    where: Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : undefined,
+    include: {
+      items: {
+        include: { product: { include: { family: true } } },
+      },
+    },
+  });
+
+  const productStats: Record<string, { 
+    name: string; 
+    family: string; 
+    quantity: number; 
+    revenue: number; 
+    cost: number;
+    profit: number;
+  }> = {};
+  
+  let totalRevenue = 0;
+  let totalCost = 0;
+  let totalProfit = 0;
+
+  for (const sale of sales) {
+    for (const item of sale.items) {
+      // Use productId as key, or customName if manual
+      const key = item.productId || item.customName || "manual-" + Math.random();
+      const name = item.product?.name || item.customName || "Artículo Genérico";
+      const familyName = item.product?.family?.name || "Artículos Manuales";
+      
+      if (!productStats[key]) {
+        productStats[key] = { name, family: familyName, quantity: 0, revenue: 0, cost: 0, profit: 0 };
+      }
+      
+      const qty = item.quantity;
+      const rev = qty * item.unitPrice;
+      // If historical items don't have unitCost, we fallback to product's purchasePrice if available, otherwise 0
+      const unitC = item.unitCost ?? (item.product?.purchasePrice || 0);
+      const cost = qty * unitC;
+      const profit = rev - cost;
+
+      productStats[key].quantity += qty;
+      productStats[key].revenue += rev;
+      productStats[key].cost += cost;
+      productStats[key].profit += profit;
+
+      totalRevenue += rev;
+      totalCost += cost;
+      totalProfit += profit;
+    }
+  }
+
+  const rows: string[][] = [];
+  for (const stats of Object.values(productStats)) {
+    rows.push([
+      stats.name, 
+      stats.family, 
+      stats.quantity.toString(), 
+      stats.revenue.toFixed(2), 
+      stats.cost.toFixed(2), 
+      stats.profit.toFixed(2)
+    ]);
+  }
+
+  return { rows, totalRevenue, totalCost, totalProfit };
+}

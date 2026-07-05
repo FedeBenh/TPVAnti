@@ -16,7 +16,7 @@ export async function getSales() {
 
 export async function createSale(data: {
   total: number;
-  items: { productId?: string; customName?: string; quantity: number; unitPrice: number }[];
+  items: { productId?: string; customName?: string; quantity: number; unitPrice: number; unitCost?: number }[];
 }) {
   const calculatedTotal = data.items.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
 
@@ -31,6 +31,7 @@ export async function createSale(data: {
             customName: item.customName || null,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
+            unitCost: item.unitCost || 0,
           })),
         },
       },

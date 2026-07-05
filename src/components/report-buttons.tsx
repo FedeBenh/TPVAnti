@@ -6,6 +6,7 @@ import {
   getDailySalesReportData,
   getMonthlySalesReportData,
   getFamilySalesReportData,
+  getProfitReportData,
 } from "@/app/actions/reports";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -44,13 +45,29 @@ export function ReportButtons() {
       // Si hay totales extra (Reporte Diario)
       if (!Array.isArray(response) && response.totalDia !== undefined) {
         const finalY = (doc as any).lastAutoTable.finalY || 30;
-        doc.setFontSize(12);
-        doc.text(`Resumen de Turnos`, 14, finalY + 10);
-        doc.setFontSize(10);
-        doc.text(`Total Turno Mañana (TM): ${response.totalTM.toFixed(2)} €`, 14, finalY + 16);
-        doc.text(`Total Turno Tarde (TT): ${response.totalTT.toFixed(2)} €`, 14, finalY + 22);
+        
+        if (response.totalTM !== undefined && response.totalTT !== undefined) {
+          doc.setFontSize(12);
+          doc.text(`Resumen de Turnos`, 14, finalY + 10);
+          doc.setFontSize(10);
+          doc.text(`Total Turno Mañana (TM): ${response.totalTM.toFixed(2)} €`, 14, finalY + 16);
+          doc.text(`Total Turno Tarde (TT): ${response.totalTT.toFixed(2)} €`, 14, finalY + 22);
+        }
+
         doc.setFontSize(14);
-        doc.text(`Total Día: ${response.totalDia.toFixed(2)} €`, 14, finalY + 30);
+        doc.text(`Total Periodo: ${response.totalDia.toFixed(2)} €`, 14, finalY + 30);
+      }
+
+      // Si hay totales de ganancias
+      if (!Array.isArray(response) && response.totalProfit !== undefined) {
+        const finalY = (doc as any).lastAutoTable.finalY || 30;
+        doc.setFontSize(12);
+        doc.text(`Resumen de Ganancias`, 14, finalY + 10);
+        doc.setFontSize(10);
+        doc.text(`Ingresos Totales: ${response.totalRevenue.toFixed(2)} €`, 14, finalY + 16);
+        doc.text(`Costes Totales: ${response.totalCost.toFixed(2)} €`, 14, finalY + 22);
+        doc.setFontSize(14);
+        doc.text(`Beneficio Neto (Ganancia): ${response.totalProfit.toFixed(2)} €`, 14, finalY + 30);
       }
 
       doc.save(filename);
@@ -127,6 +144,38 @@ export function ReportButtons() {
       >
         <FileText className="mr-2 h-4 w-4" />
         {loading === "ventas_familias_mes.pdf" ? "Generando..." : "Familias Mes PDF"}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={!!loading}
+        onClick={() =>
+          downloadPdf(
+            "Reporte de Ganancias (Hoy)",
+            "ganancias_hoy.pdf",
+            ["Artículo", "Familia", "Cantidad", "Ingresos", "Costes", "Ganancia"],
+            () => getProfitReportData("day")
+          )
+        }
+      >
+        <FileText className="mr-2 h-4 w-4" />
+        {loading === "ganancias_hoy.pdf" ? "Generando..." : "Ganancias Hoy PDF"}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={!!loading}
+        onClick={() =>
+          downloadPdf(
+            "Reporte de Ganancias (Mensual)",
+            "ganancias_mes.pdf",
+            ["Artículo", "Familia", "Cantidad", "Ingresos", "Costes", "Ganancia"],
+            () => getProfitReportData("month")
+          )
+        }
+      >
+        <FileText className="mr-2 h-4 w-4" />
+        {loading === "ganancias_mes.pdf" ? "Generando..." : "Ganancias Mes PDF"}
       </Button>
     </div>
   );
