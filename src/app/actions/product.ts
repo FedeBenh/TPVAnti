@@ -27,6 +27,7 @@ export async function createProduct(data: {
   order?: number;
   trackStock?: boolean;
   minStock?: number;
+  active?: boolean;
 }) {
   const result = await prisma.product.create({
     data: {
