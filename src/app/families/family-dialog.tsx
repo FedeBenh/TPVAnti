@@ -65,7 +65,7 @@ export function FamilyDialog({
             {family ? "Editar Familia" : "Nueva Familia"}
           </DialogTitle>
         </DialogHeader>
-        <form action={onSubmit}>
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit(new FormData(e.currentTarget)); }}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="name">Nombre</Label>
