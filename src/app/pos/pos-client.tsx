@@ -105,6 +105,7 @@ export function PosClient({
 }) {
   const { cart, addItem, removeItem, updateQuantity, clearCart } =
     usePosStore();
+  const [viewMode, setViewMode] = useState<"families" | "products">("families");
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -239,7 +240,10 @@ export function PosClient({
               placeholder="Buscar producto..."
               className="pl-8 h-10 text-lg bg-background"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (e.target.value) setViewMode("products");
+              }}
             />
           </div>
           <ManualItemDialog 
@@ -255,50 +259,82 @@ export function PosClient({
           />
         </div>
 
-        {/* Familias */}
-        {!searchQuery && (
-          <div className="p-4 border-b bg-card overflow-x-auto whitespace-nowrap">
-            <div className="flex gap-2">
-              <Button
-                variant={selectedFamily === null ? "default" : "outline"}
-                className="h-12 px-6 rounded-full"
-                onClick={() => setSelectedFamily(null)}
+        {/* Vista de Familias */}
+        {viewMode === "families" && !searchQuery && (
+          <ScrollArea className="flex-1 p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <button
+                className="flex flex-col items-center justify-center p-4 h-32 border-2 border-primary/20 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-colors text-center shadow-sm active:scale-95"
+                onClick={() => {
+                  setSelectedFamily(null);
+                  setViewMode("products");
+                }}
               >
-                Todas
-              </Button>
+                <span className="font-bold text-xl text-primary">Todos los artículos</span>
+              </button>
               {families.map((f) => (
-                <Button
+                <button
                   key={f.id}
-                  variant={selectedFamily === f.id ? "default" : "outline"}
-                  className="h-12 px-6 rounded-full"
-                  onClick={() => setSelectedFamily(f.id)}
+                  className="flex flex-col items-center justify-center p-4 h-32 border rounded-2xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95"
+                  onClick={() => {
+                    setSelectedFamily(f.id);
+                    setViewMode("products");
+                  }}
                 >
-                  {f.name}
-                </Button>
+                  <span className="font-bold text-xl line-clamp-2 leading-tight">
+                    {f.name}
+                  </span>
+                </button>
               ))}
             </div>
-          </div>
+          </ScrollArea>
         )}
 
-        {/* Productos */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {filteredProducts.map((p) => (
-              <button
-                key={p.id}
-                className="flex flex-col items-center justify-center p-4 h-28 border rounded-xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95"
-                onClick={() => addItem({ ...p, purchasePrice: p.purchasePrice ?? undefined })}
-              >
-                <span className="font-semibold text-lg line-clamp-2 leading-tight">
-                  {p.name}
-                </span>
-                <span className="text-muted-foreground mt-2 font-medium">
-                  {p.salePrice.toFixed(2)} €
-                </span>
-              </button>
-            ))}
+        {/* Vista de Productos */}
+        {(viewMode === "products" || searchQuery) && (
+          <div className="flex flex-col flex-1 min-h-0">
+            {!searchQuery && (
+              <div className="p-4 pb-0 flex items-center gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode("families")} 
+                  className="rounded-full shadow-sm"
+                >
+                  &larr; Familias
+                </Button>
+                <h2 className="font-bold text-lg text-muted-foreground line-clamp-1">
+                  {selectedFamily === null 
+                    ? "Todos los artículos" 
+                    : families.find(f => f.id === selectedFamily)?.name}
+                </h2>
+              </div>
+            )}
+            <ScrollArea className="flex-1 p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {filteredProducts.length === 0 ? (
+                  <div className="col-span-full text-center py-10 text-muted-foreground">
+                    No se encontraron artículos.
+                  </div>
+                ) : (
+                  filteredProducts.map((p) => (
+                    <button
+                      key={p.id}
+                      className="flex flex-col items-center justify-center p-4 h-28 border rounded-xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95"
+                      onClick={() => addItem({ ...p, purchasePrice: p.purchasePrice ?? undefined })}
+                    >
+                      <span className="font-semibold text-base line-clamp-2 leading-tight">
+                        {p.name}
+                      </span>
+                      <span className="text-muted-foreground mt-2 font-medium">
+                        {p.salePrice.toFixed(2)} €
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
           </div>
-        </ScrollArea>
+        )}
       </div>
 
       {/* Botón flotante móvil para carrito */}
