@@ -15,11 +15,12 @@ export async function getFamily(id: string) {
   });
 }
 
-export async function createFamily(data: { name: string; order?: number }) {
+export async function createFamily(data: { name: string; order?: number; image?: string | null }) {
   const result = await prisma.family.create({
     data: {
       name: data.name,
       order: data.order ?? 0,
+      image: data.image,
     },
   });
   revalidatePath("/families");
@@ -28,7 +29,7 @@ export async function createFamily(data: { name: string; order?: number }) {
 
 export async function updateFamily(
   id: string,
-  data: { name?: string; order?: number }
+  data: { name?: string; order?: number; image?: string | null }
 ) {
   const result = await prisma.family.update({
     where: { id },

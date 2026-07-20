@@ -11,6 +11,7 @@ datasource db {
 model Family {
   id        String    @id @default(uuid())
   name      String
+  image     String?
   order     Int       @default(0)
   products  Product[]
   createdAt DateTime  @default(now())
@@ -20,6 +21,7 @@ model Family {
 model Product {
   id            String         @id @default(uuid())
   name          String
+  image         String?
   familyId      String
   family        Family         @relation(fields: [familyId], references: [id])
   salePrice     Float

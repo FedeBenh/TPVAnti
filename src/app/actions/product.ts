@@ -28,6 +28,7 @@ export async function createProduct(data: {
   trackStock?: boolean;
   minStock?: number;
   active?: boolean;
+  image?: string | null;
 }) {
   const result = await prisma.product.create({
     data: {
@@ -40,6 +41,7 @@ export async function createProduct(data: {
       active: data.active ?? true,
       trackStock: data.trackStock ?? true,
       minStock: data.minStock ?? 5,
+      image: data.image,
     },
   });
   revalidatePath("/products");
@@ -59,6 +61,7 @@ export async function updateProduct(
     active: boolean;
     trackStock: boolean;
     minStock: number;
+    image: string | null;
   }>
 ) {
   const result = await prisma.product.update({

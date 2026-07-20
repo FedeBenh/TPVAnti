@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/sheet";
 import { ShoppingCart } from "lucide-react";
 
-type Family = { id: string; name: string };
-type Product = { id: string; name: string; familyId: string; salePrice: number; purchasePrice?: number | null; active: boolean };
+type Family = { id: string; name: string; image?: string | null };
+type Product = { id: string; name: string; familyId: string; salePrice: number; purchasePrice?: number | null; active: boolean; image?: string | null };
 
 import {
   Dialog,
@@ -231,7 +231,7 @@ export function PosClient({
   return (
     <div className="flex flex-1 overflow-hidden relative w-full">
       {/* Zona Izquierda: Productos y Familias */}
-      <div className="flex-1 flex flex-col min-h-0 bg-muted/10 pb-20 md:pb-0">
+      <div className="flex-1 flex flex-col min-h-0 bg-muted/10">
         <div className="p-4 border-b bg-card flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -261,10 +261,10 @@ export function PosClient({
 
         {/* Vista de Familias */}
         {viewMode === "families" && !searchQuery && (
-          <ScrollArea className="flex-1 p-4">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-28 md:pb-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               <button
-                className="flex flex-col items-center justify-center p-4 h-32 border-2 border-primary/20 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-colors text-center shadow-sm active:scale-95"
+                className="flex flex-col items-center justify-center p-4 h-36 border-2 border-primary/20 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-colors text-center shadow-sm active:scale-95"
                 onClick={() => {
                   setSelectedFamily(null);
                   setViewMode("products");
@@ -275,19 +275,31 @@ export function PosClient({
               {families.map((f) => (
                 <button
                   key={f.id}
-                  className="flex flex-col items-center justify-center p-4 h-32 border rounded-2xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95"
+                  className="relative flex flex-col items-center justify-center h-36 border rounded-2xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95 overflow-hidden group"
                   onClick={() => {
                     setSelectedFamily(f.id);
                     setViewMode("products");
                   }}
                 >
-                  <span className="font-bold text-xl line-clamp-2 leading-tight">
-                    {f.name}
-                  </span>
+                  {f.image ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={f.image} alt={f.name} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-30 transition-opacity" />
+                      <div className="relative z-10 p-2 w-full h-full flex items-center justify-center bg-black/20">
+                        <span className="font-bold text-xl text-white drop-shadow-md line-clamp-2 leading-tight">
+                          {f.name}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <span className="font-bold text-xl line-clamp-2 leading-tight p-4">
+                      {f.name}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         )}
 
         {/* Vista de Productos */}
@@ -309,7 +321,7 @@ export function PosClient({
                 </h2>
               </div>
             )}
-            <ScrollArea className="flex-1 p-4">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-28 md:pb-4">
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {filteredProducts.length === 0 ? (
                   <div className="col-span-full text-center py-10 text-muted-foreground">
@@ -319,20 +331,37 @@ export function PosClient({
                   filteredProducts.map((p) => (
                     <button
                       key={p.id}
-                      className="flex flex-col items-center justify-center p-4 h-28 border rounded-xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95"
+                      className="relative flex flex-col items-center justify-center h-32 border rounded-xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95 overflow-hidden"
                       onClick={() => addItem({ ...p, purchasePrice: p.purchasePrice ?? undefined })}
                     >
-                      <span className="font-semibold text-base line-clamp-2 leading-tight">
-                        {p.name}
-                      </span>
-                      <span className="text-muted-foreground mt-2 font-medium">
-                        {p.salePrice.toFixed(2)} €
-                      </span>
+                      {p.image ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={p.image} alt={p.name} className="absolute inset-0 w-full h-full object-cover opacity-20" />
+                          <div className="relative z-10 p-2 flex flex-col h-full w-full items-center justify-center bg-black/10">
+                            <span className="font-semibold text-base text-foreground drop-shadow-sm line-clamp-2 leading-tight">
+                              {p.name}
+                            </span>
+                            <span className="text-foreground mt-2 font-bold drop-shadow-sm">
+                              {p.salePrice.toFixed(2)} €
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-2 flex flex-col items-center justify-center h-full w-full">
+                          <span className="font-semibold text-base line-clamp-2 leading-tight">
+                            {p.name}
+                          </span>
+                          <span className="text-muted-foreground mt-2 font-medium">
+                            {p.salePrice.toFixed(2)} €
+                          </span>
+                        </div>
+                      )}
                     </button>
                   ))
                 )}
               </div>
-            </ScrollArea>
+            </div>
           </div>
         )}
       </div>
