@@ -11,8 +11,8 @@ if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
     url: process.env.TURSO_DATABASE_URL,
     authToken: process.env.TURSO_AUTH_TOKEN,
   });
-  const adapter = new PrismaLibSql(libsql);
-  prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
+  const adapter = new PrismaLibSql(libsql as any);
+  prisma = globalForPrisma.prisma || new PrismaClient({ adapter: adapter as any });
 } else {
   prisma = globalForPrisma.prisma || new PrismaClient();
 }

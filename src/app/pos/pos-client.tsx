@@ -50,6 +50,7 @@ function ManualItemDialog({ onAdd }: { onAdd: (name: string, price: number) => v
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {/* @ts-expect-error react 19 compatibility */}
       <DialogTrigger asChild>
         <Button variant="secondary" className="h-10">
           Añadir Varios
@@ -286,7 +287,7 @@ export function PosClient({
               <button
                 key={p.id}
                 className="flex flex-col items-center justify-center p-4 h-28 border rounded-xl bg-card hover:bg-accent hover:text-accent-foreground transition-colors text-center shadow-sm active:scale-95"
-                onClick={() => addItem(p)}
+                onClick={() => addItem({ ...p, purchasePrice: p.purchasePrice ?? undefined })}
               >
                 <span className="font-semibold text-lg line-clamp-2 leading-tight">
                   {p.name}
