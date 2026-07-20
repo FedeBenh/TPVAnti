@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getPurchases } from "@/app/actions/purchase";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -78,3 +79,4 @@ export default async function PurchasesPage() {
     </div>
   );
 }
+

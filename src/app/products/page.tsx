@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getProducts } from "@/app/actions/product";
 import { getFamilies } from "@/app/actions/family";
 import { ProductDialog } from "./product-dialog";
@@ -72,3 +73,4 @@ export default async function ProductsPage() {
     </div>
   );
 }
+

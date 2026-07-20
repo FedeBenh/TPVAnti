@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getFamilies } from "@/app/actions/family";
 import { FamilyDialog } from "./family-dialog";
 import { DeleteFamilyButton } from "./delete-family-button";
@@ -55,3 +56,4 @@ export default async function FamiliesPage() {
     </div>
   );
 }
+

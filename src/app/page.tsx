@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getDashboardStats } from "@/app/actions/sale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -134,3 +135,4 @@ export default async function DashboardPage() {
     </div>
   );
 }
+

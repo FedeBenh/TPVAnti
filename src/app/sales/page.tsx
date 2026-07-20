@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getSales } from "@/app/actions/sale";
 import {
   Table,
@@ -65,3 +66,4 @@ export default async function SalesPage() {
     </div>
   );
 }
+

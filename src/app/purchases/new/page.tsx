@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getProducts } from "@/app/actions/product";
 import { PurchaseForm } from "./purchase-form";
 
@@ -16,3 +17,4 @@ export default async function NewPurchasePage() {
     </div>
   );
 }
+

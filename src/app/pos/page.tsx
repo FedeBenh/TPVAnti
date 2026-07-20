@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getFamilies } from "@/app/actions/family";
 import { getProducts } from "@/app/actions/product";
 import { PosClient } from "./pos-client";
@@ -23,3 +24,4 @@ export default async function PosPage() {
     </div>
   );
 }
+
